@@ -12,25 +12,25 @@ interface ITask {
   finished: boolean;
 }
 
-export const TasksForm: React.FC = () => {
-  
+export const FormEdit: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  
   const [model, setModel] = useState<ITask[]>({
     title: " ",
     description: " ",
     valor: " ",
-    
-    
+    finished: " "
   });
 
+  
   useEffect(() => {
     if (id !== undefined) {
       findBill(id);
     }
   }, [id]);
 
-  function updateModel(e: ChangeEvent<HTMLInputElement>) {
+	function updateModel(e: ChangeEvent<HTMLInputElement>) {
     setModel({
       ...model,
       [e.target.name]: e.target.value,
@@ -39,13 +39,12 @@ export const TasksForm: React.FC = () => {
 
   async function onSubmit(e: ChangeEvent<HTMLInputElement>) {
     e.preventDefault();
-    // if (id !== undefined) {
-    //  const response = await api.put(`/bills/${id}`, model);
-    //} else {
-    const response = await api.post("/bills", model);
+    //if (id !== undefined) {
+    const response = await api.put(`/bills/${id}`, model);
+    // } else {
+    //  const response = await api.post("/bills", model);
     //}
     back();
-    console.log("edit");
   }
 
   async function findBill(id) {
@@ -54,7 +53,7 @@ export const TasksForm: React.FC = () => {
       title: response.data.title,
       description: response.data.description,
       valor: response.data.valor,
-      
+      finished: response.data.finished,
     });
   }
 
@@ -63,13 +62,24 @@ export const TasksForm: React.FC = () => {
   }
   
   
+  const [bills, setBills] = useState<ITask[]>();
+  
+  useEffect(() => {
+   // upBills();
+  }, [id]);
+  
+  
+  
+  //await api.patch(`/bills/${id}`, bills);
+  
+
   
 
   return (
     <div className="container">
       <br />
       <div className="task-header">
-        <h1>Register New Bill</h1>
+        <h1>Edit Bill</h1>
         <Button variant="dark" size="sm" onClick={back}>
           Voltar
         </Button>
@@ -83,17 +93,21 @@ export const TasksForm: React.FC = () => {
               type="text"
               name="title"
               value={model.title}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => updateModel(e)}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                updateModel(event)
+              }
             />
           </Form.Group>
           <Form.Group>
             <Form.Label>Descrição</Form.Label>
             <Form.Control
               as="textarea"
-              rows={2}
+              rows={1}
               name="description"
               value={model.description}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => updateModel(e)}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                updateModel(event)
+              }
             />
           </Form.Group>
           <Form.Group>
@@ -102,10 +116,28 @@ export const TasksForm: React.FC = () => {
               type="number"
               name="valor"
               value={model.valor}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => updateModel(e)}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                updateModel(event)
+              }
             />
           </Form.Group>
-          
+
+          <Form.Group>
+            <Form.Label>Status</Form.Label>
+            <br />
+            <Form.Control
+              as="select"
+              type="text"
+              name="finished"
+              value={bills.finished}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                updateModel(event)}
+            >
+              <option value={true}>FINALIZADO</option>
+              <option value={false}>PENDENTE</option>
+            </Form.Control>
+          </Form.Group>
+
           <br />
           <Button variant="dark" type="submit">
             Salvar

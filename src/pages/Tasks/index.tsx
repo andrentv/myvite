@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Table from "react-bootstrap/Table";
-import Badge from "react-bootstrap/Badge";
-import Button from "react-bootstrap/Button";
+import { Table, Badge, Button } from "react-bootstrap";
 import api from "../../services/api";
 
 import "./index.css";
 
 import moment from "moment";
 
-interface iTask {
+interface ITask {
   id: number;
   title: string;
   description: string;
@@ -20,7 +18,7 @@ interface iTask {
 }
 
 export const Tasks: React.FC = () => {
-  const [bills, setBills] = useState<iTask[]>([]);
+  const [bills, setBills] = useState<ITask[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,6 +28,11 @@ export const Tasks: React.FC = () => {
   async function loadBills() {
     const response = await api.get("/bills");
     setBills(response.data);
+  }
+
+  async function finishedBill(id: number) {
+    await api.patch(`/bills/${id}`);
+    loadBills();
   }
 
   async function delBill(id: number) {
@@ -47,6 +50,11 @@ export const Tasks: React.FC = () => {
 
   function editBill(id: number) {
     navigate(`/tarefas_cadastro/${id}`);
+    //console.log("edit")
+  }
+
+  function viewBill(id: number) {
+    navigate(`/tarefas/${id}`);
     //console.log("edit")
   }
 
@@ -83,23 +91,31 @@ export const Tasks: React.FC = () => {
               <td>{formatDate(bill.created_at)}</td>
               <td>{formatDate(bill.updated_at)}</td>
               <td>
-                <Badge variant={bill.finished ? "success" : "warning"}>
-                  {bill.finished ? "FINALIZADO" : "PENDENTE"}
+                <Badge variant={bill?.finished ? "success" : "warning"}>
+                  {bill?.finished ? "FINALIZADO" : "PENDENTE"}
                 </Badge>
               </td>
               <td>
                 <Button
-                  disabled={bill.finished}
                   size="sm"
                   variant="primary"
                   onClick={() => editBill(bill.id)}
                 >
                   Editar
                 </Button>{" "}
-                <Button disabled={bill.finished} size="sm" variant="success">
+                <Button
+                  disabled={bill.finished}
+                  onClick={() => finishedBill(bill.id)}
+                  size="sm"
+                  variant="success"
+                >
                   Finalizar
                 </Button>{" "}
-                <Button size="sm" variant="info">
+                <Button
+                  onClick={() => viewBill(bill.id)}
+                  size="sm"
+                  variant="info"
+                >
                   Visualizar
                 </Button>{" "}
                 <Button
